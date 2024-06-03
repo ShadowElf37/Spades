@@ -8,6 +8,7 @@ records = defaultdict(list)
 
 MIN_DATE = dt(2024, 6, 3)
 MAX_DATE = dt.now()
+PRINT_EXTRA = False
 
 
 for fname in listdir('Games'):
@@ -17,7 +18,7 @@ for fname in listdir('Games'):
     with open('Games/'+fname, 'r') as f:
         reader = csv.reader(f, delimiter=' ')
         for row in reader:
-            records[row[-1]].append(tuple(map(int, row[:-1])))
+            records[row[3]].append(tuple(map(int, row[:3])))
 
 print('All records from', MIN_DATE.strftime('%Y-%m-%d %H:%M:%S'), 'to', MAX_DATE.strftime('%Y-%m-%d %H:%M:%S'))
 print('='*60)
@@ -53,10 +54,10 @@ for name, record in records.items():
     makes = np.array(makes)
 
     print(name.upper())
-    print('Core Stats:')
+    if PRINT_EXTRA: print('Core Stats:')
     print(f'\tAverage bid: {round(np.mean(bids), 2)} ± {round(np.std(bids), 2)}')
     print(f'\tAverage made: {round(np.mean(makes), 2)} ± {round(np.std(makes), 2)}')
-    print(f'\tAverage miss: {round(np.mean(makes-bids), 2)} ± {round(np.std(makes-bids), 2)}')
+    print(f'\tAverage overbid: {round(np.mean(bids-makes), 2)} ± {round(np.std(bids-makes), 2)}')
     if non_zero_bid != 0:
         print(f'\tNonzero over/perfect/under rates: {round(len(overbids)/non_zero_bid*100)}% / {round(perfect/non_zero_bid*100)}% / {round(len(underbids)/non_zero_bid*100)}%')
     else:
@@ -69,19 +70,20 @@ for name, record in records.items():
 
     print(f'\tTeam bust rate: {round(sum(busts) / len(record) * 100)}%')
 
-    print('Extra Stats:')
-    print(f'\tAverage miss magnitude: {round(np.mean(np.abs(makes - bids)), 2)} ± {round(np.std(np.abs(makes - bids)), 2)}')
-    if len(overbids) != 0:
-        print(f'\tAverage magnitude of overbids: {round(np.mean(overbids), 2)} ± {round(np.std(overbids), 2)}')
-    else:
-        print(f'\tAverage magnitude of overbids: n/a')
-    if len(underbids) != 0:
-        print(f'\tAverage magnitude of underbids: {round(abs(np.mean(underbids)), 2)} ± {round(np.std(underbids), 2)}')
-    else:
-        print(f'\tAverage magnitude of underbids: n/a')
+    if PRINT_EXTRA:
+        print('Extra Stats:')
+        print(f'\tAverage miss magnitude: {round(np.mean(np.abs(makes - bids)), 2)} ± {round(np.std(np.abs(makes - bids)), 2)}')
+        if len(overbids) != 0:
+            print(f'\tAverage magnitude of overbids: {round(np.mean(overbids), 2)} ± {round(np.std(overbids), 2)}')
+        else:
+            print(f'\tAverage magnitude of overbids: n/a')
+        if len(underbids) != 0:
+            print(f'\tAverage magnitude of underbids: {round(abs(np.mean(underbids)), 2)} ± {round(np.std(underbids), 2)}')
+        else:
+            print(f'\tAverage magnitude of underbids: n/a')
 
 
-    print(f'\tZero bid rate: {round(zero_bid / len(record) * 100)}%')
+        print(f'\tZero bid rate: {round(zero_bid / len(record) * 100)}%')
 
 
     print('-'*30)

@@ -1,9 +1,12 @@
-import csv, time
-import os
+import csv, time, os
 
-ZERO_SCORE_ADD = 70        
+ZERO_SCORE_ADD = 70
+
+TIMESTAMP = str(int(time.time()))
+UUID_N = 0
 
 class Team:
+    
     def __init__(self, i, players=2):
         self.players = players
         self.i = i+1
@@ -26,13 +29,16 @@ class Team:
             self.tricks[i] = int(input(f'{name}\'s tricks: '))
 
     def add_score(self):
+        global UUID_N, TIMESTAMP
+        UUID_N += 1
+
         bust = 1
         if sum(self.tricks) >= sum(self.bids):
             self.score += sum(self.bids)*10 + (sum(self.tricks) - sum(self.bids))
             bust = 0
 
         for trick, bid, name in zip(self.tricks, self.bids, self.names):
-            self.stats.append((bid, trick, bust, name))
+            self.stats.append((bid, trick, bust, name, f'{TIMESTAMP}{UUID_N:03}'))
             
             if bid == 0:
                 if trick == 0:
@@ -46,6 +52,8 @@ class Game:
         self.end = int(input('Score we are playing to: '))
 
     def start(self):
+        global TIMESTAMP
+        
         i = 0
         while True:
             i += 1
@@ -55,7 +63,7 @@ class Game:
                 print(f'\n{winner.playerlist()} wins!  {self.score()}')
 
                 os.makedirs('Games', exist_ok=True)
-                with open('Games/spades_'+str(int(time.time()))+'.txt', 'w') as f:
+                with open('Games/spades_'+TIMESTAMP+'.txt', 'w') as f:
                     writer = csv.writer(f, delimiter=' ')
                     for team in self.teams:
                         for stat in team.stats:
