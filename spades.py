@@ -1,4 +1,5 @@
 import csv, time
+import os
 
 ZERO_SCORE_ADD = 70        
 
@@ -53,6 +54,7 @@ class Game:
             if (winner := max(self.teams, key=(lambda t: t.score))).score > self.end:
                 print(f'\n{winner.playerlist()} wins!  {self.score()}')
 
+                os.makedirs('Games', exist_ok=True)
                 with open('Games/spades_'+str(int(time.time()))+'.txt', 'w') as f:
                     writer = csv.writer(f, delimiter=' ')
                     for team in self.teams:
