@@ -13,7 +13,7 @@ class Team:
         self.bids = [0]*players
         self.tricks = [0]*players
 
-        self.stats = [] # bid, made, name
+        self.stats = [] # bid, made, team_bust?, name
 
     def playerlist(self):
         return '/'.join(self.names)
